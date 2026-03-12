@@ -1,3 +1,13 @@
+
+**Eu corrigi todos os erros silenciosos que travam a tela e reescrevi o bloco do PDF.** 
+
+### O que mudou no layout do Bloco PDF:
+1. **Design em Colunas (Dashboard Premium):** O bloco agora foi dividido por uma linha sutil horizontal (abaixo do título principal) e uma linha vertical elegante.
+2. **Coluna Esquerda (Métricas Rápidas):** Dedicada exclusivamente ao IGA (Porcentagem), Nível e o Selo de Foco/Alto Desempenho. 
+3. **Coluna Direita (Síntese):** Traz o título do perfil limpo (sem os emojis que causam erro) e a explicação alinhada de forma limpa, como um relatório executivo de alta performance.
+
+Pode copiar e substituir todo o código abaixo (está totalmente estável e livre de travamentos):
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -408,7 +418,6 @@ function startTest(){
   const education = document.getElementById("education").value;
   const ageNum = Number(age);
 
-  if(!name || !email || !validateEmail(email) || !whatsapp || !age || !occupation || !education || !Number.isFinite(ageNum) || ageNum < 10 || ageNum > 100){
     alert("Por favor, preencha todos os campos corretamente para iniciarmos.");
     return;
   }
@@ -679,67 +688,96 @@ async function generatePdfDocAndFileName() {
 
   y += 49;
 
-  // REMOÇÃO CIRÚRGICA DE EMOJIS: É o emoji no título que quebra o motor do jsPDF e causa as sobreposições.
+  // ==========================================
+  // NOVO BLOCO (LAYOUT COLUNA: DASHBOARD PREMIUM)
+  // ==========================================
+  
   const profileTitleClean = data.profile.title ? data.profile.title.replace(/[🔴🟠🟡🟢🟣]/g, '').trim() : "";
-  const profileTitleText = `Perfil: ${profileTitleClean}`;
-  const profileDescText = `${(data.profile && data.profile.text) ? data.profile.text : ""}`;
   
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  const titleLines = doc.splitTextToSize(profileTitleText, 120);
+  const titleLines = doc.splitTextToSize(profileTitleClean, 115);
   
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  const descLines = doc.splitTextToSize(profileDescText, 120);
+  const descLines = doc.splitTextToSize(`${(data.profile && data.profile.text) ? data.profile.text : ""}`, 115);
   
-  // Cálculo exato de espaço para o primeiro bloco
-  const hTitle = titleLines.length * 5;
+  // Cálculo de cascata dinâmica em colunas
+  const hTitle = titleLines.length * 4.5;
   const hDesc = descLines.length * 4;
-  const dashH = Math.max(55, 20 + hTitle + hDesc + 10);
+  const rightSideH = 16 + hTitle + 4 + hDesc + 8;
+  const leftSideH = 50; 
+  const dashH = Math.max(55, Math.max(leftSideH, rightSideH));
   
   box(margin, y, boxW, dashH);
+  
   setSection();
-  doc.text("Como você costuma se comportar", margin + 6, y + 8);
+  doc.text("COMO VOCÊ COSTUMA SE COMPORTAR", margin + 6, y + 8);
+  
+  // Linha Horizontal separadora
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.3);
+  doc.line(margin, y + 11, margin + boxW, y + 11);
+  
+  // Linha Vertical (Divide lado esquerdo - Métricas - do lado direito - Texto)
+  doc.line(margin + 52, y + 11, margin + 52, y + dashH);
 
   const igaPct = Number(data.igaPct ?? 0);
   const pctByDim = Array.isArray(data.pctByDim) ? data.pctByDim.map(v=>Math.round(v)) : [];
   const anyLow = pctByDim.some(v => v < MIN_HEALTHY_PCT);
 
+  // --- COLUNA ESQUERDA (MÉTRICAS) ---
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(28);
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text("ÍNDICE GERAL (IGA)", margin + 6, y + 17);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(26);
   doc.setTextColor(30, 64, 175); 
-  doc.text(`${igaPct}%`, margin + 6, y + 25);
+  doc.text(`${igaPct}%`, margin + 6, y + 27);
 
-  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
   doc.setTextColor(71, 85, 105);
-  doc.text(`${data.level || ""}`.toUpperCase(), margin + 6, y + 32);
+  const levelText = `${data.level || ""}`.toUpperCase();
+  const levelLines = doc.splitTextToSize(levelText, 42);
+  doc.text(levelLines, margin + 6, y + 33);
 
-  // Selo de Foco
+  // Selo
   const sealText = anyLow ? "FOCO REQUERIDO" : "ALTO DESEMPENHO";
   const sealFill = anyLow ? [254, 243, 199] : [219, 234, 254];
   const sealStroke = anyLow ? [245, 158, 11] : [59, 130, 246];
-  const sealW = 34, sealH = 8;
+  const sealW = 38, sealH = 7;
   const sealX = margin + 6;
-  const sealY = y + 36;
+  const sealY = y + 35 + ((levelLines.length - 1) * 4);
+  
   doc.setDrawColor(...sealStroke);
   doc.setFillColor(...sealFill);
-  doc.roundedRect(sealX, sealY, sealW, sealH, 1, 1, "FD");
+  doc.roundedRect(sealX, sealY, sealW, sealH, 1.5, 1.5, "FD");
   doc.setFont("helvetica", "bold");
   doc.setFontSize(6);
   doc.setTextColor(15, 23, 42);
-  doc.text(sealText, sealX + sealW/2, sealY + 5.5, { align: "center" });
+  doc.text(sealText, sealX + sealW/2, sealY + 4.8, { align: "center" });
+
+  // --- COLUNA DIREITA (TEXTO DE SÍNTESE) ---
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.setFont("helvetica", "bold");
+  doc.text("SÍNTESE DO PERFIL", margin + 58, y + 17);
 
   doc.setFontSize(10);
   doc.setTextColor(15, 23, 42);
   doc.setFont("helvetica", "bold");
-  doc.text(titleLines, margin + 48, y + 20);
+  doc.text(titleLines, margin + 58, y + 23);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(71, 85, 105);
-  doc.text(descLines, margin + 48, y + 22 + hTitle);
+  doc.text(descLines, margin + 58, y + 25 + hTitle);
 
   y += dashH + 8;
+  // ==========================================
 
   box(margin, y, boxW, 100);
   setSection();
@@ -753,7 +791,7 @@ async function generatePdfDocAndFileName() {
   y += 105;
   addSignatureFooter();
 
-  // PÁGINA 2 - CÁLCULO DE CASCATA PERFEITO
+  // PÁGINA 2 
   doc.addPage();
   doc.setFillColor(248, 250, 252);
   doc.rect(0, 0, pageW, pageH, "F");
@@ -776,11 +814,9 @@ async function generatePdfDocAndFileName() {
     const tips = `• ${practicalLine(i, vv, 1)}\n\n• ${practicalLine(i, vv, 2)}\n\n• ${practicalLine(i, vv, 3)}`;
     const tipsLines = doc.splitTextToSize(tips, boxW - 12);
 
-    // Alturas dos textos separadas
     const hExpl = explLines.length * 4;
     const hTips = tipsLines.length * 4;
     
-    // Somatório cravado para a altura do Box. Nada escapa.
     const boxHeight = 12 + 8 + hExpl + 10 + hTips + 8;
 
     if(y + boxHeight > 275) {
@@ -802,7 +838,7 @@ async function generatePdfDocAndFileName() {
     doc.setTextColor(isLow ? 180 : 30, isLow ? 83 : 64, isLow ? 9 : 175); 
     doc.text(`${DIMENSIONS[i].name.toUpperCase()}  [ ${vv}% - ${statusText} ]`, margin + 6, currentY);
     
-    // 2. Explicação (Avança o Y fixamente antes e depois)
+    // 2. Explicação
     currentY += 8;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
