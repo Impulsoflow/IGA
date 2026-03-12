@@ -187,7 +187,7 @@
 
         <div class="sig-ui mt-8 border-t border-slate-200 pt-5">
           <span class="text-xl">Rogério Braga</span><br>
-          <span class="text-xs text-slate-500 font-sans font-bold tracking-widest uppercase mt-1 block">Master Coach Institucional</span>
+          <span class="text-xs text-slate-500 font-sans font-bold tracking-widest uppercase mt-1 block">Master Coach Executivo</span>
         </div>
       </div>
     </div>
@@ -653,7 +653,7 @@ async function generatePdfDocAndFileName() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     doc.setTextColor(100, 116, 139);
-    doc.text("Rogério Braga - Master Caoch Executivo - impulsoflow@gmail.com", pageW - margin, pageH - 8, { align: "right" });
+    doc.text("Rogério Braga - Master Coach Executivo - impulsoflow@gmail.com", pageW - margin, pageH - 8, { align: "right" });
   }
 
   doc.setFillColor(248, 250, 252);
@@ -715,8 +715,7 @@ async function generatePdfDocAndFileName() {
   doc.text(`${data.level || ""}`.toUpperCase(), margin + 6, y + 32);
 
   // Selo de Foco
-  const sealText = anyLow ? "FOCO REQUERIDO";
-  const sealText = anyLow ? "ALTO DESEMPENHO";
+  const sealText = anyLow ? "FOCO REQUERIDO" : "ALTO DESEMPENHO";
   const sealFill = anyLow ? [254, 243, 199] : [219, 234, 254];
   const sealStroke = anyLow ? [245, 158, 11] : [59, 130, 246];
   const sealW = 34, sealH = 8;
@@ -768,8 +767,8 @@ async function generatePdfDocAndFileName() {
   (data.pctByDim || []).forEach((v, i) => {
     const vv = Math.round(v);
     const isLow = vv < MIN_HEALTHY_PCT;
-    const statusText = isLow ? "ZONA DE DESENVOLVIMENTO (Abaixo do Ideal)";
-    const statusText = isLow ? "ZONA DE EXCELÊNCIA (Padrão de Alta Performance)";    
+    const statusText = isLow ? "ZONA DE DESENVOLVIMENTO (Abaixo do Ideal)" : "ZONA DE EXCELÊNCIA (Padrão de Alta Performance)";
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     const explLines = doc.splitTextToSize(`Parecer Técnico: ${bandExplain(vv)}`, boxW - 12);
@@ -826,7 +825,7 @@ async function generatePdfDocAndFileName() {
   });
 
   addSignatureFooter();
-  const pdfFileName = `I.G.A.: ${sanitize(data.user.name).replace(/\s+/g,"_")}.pdf`;
+  const pdfFileName = `IGA_${sanitize(data.user.name).replace(/\s+/g,"_")}.pdf`;
   return { doc, pdfFileName };
 }
 
