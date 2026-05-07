@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IGA 360° — Painel do Avaliado | Impulso IE™ de Liderança</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --primary:#0b4aa2; --primary-dark:#062b62; --primary-light:#3b82f6;
+  --accent:#f59e0b; --success:#16a34a; --error:#dc2626; --warning:#d97706;
+  --bg:#f0f7ff; --card:#ffffff; --text:#0f172a; --muted:#64748b;
+  --border:#e2e8f0; --gradient:linear-gradient(135deg,#0b4aa2 0%,#062b62 100%);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background:
+  radial-gradient(circle at 10% 20%,rgba(11,74,162,0.08) 0%,transparent 40%),
+  radial-gradient(circle at 90% 80%,rgba(245,158,11,0.06) 0%,transparent 40%);
+  pointer-events:none;z-index:0}
+.container{max-width:980px;margin:0 auto;padding:24px 16px;position:relative;z-index:1}
+
+/* HEADER */
+.header{background:var(--gradient);color:#fff;padding:32px 28px;border-radius:20px;text-align:center;margin-bottom:20px;box-shadow:0 20px 50px rgba(11,74,162,0.25)}
+.logo{font-size:13px;letter-spacing:0.25em;text-transform:uppercase;opacity:0.85;font-weight:700;margin-bottom:8px}
+.title{font-family:'Playfair Display',serif;font-size:32px;font-weight:600;margin-bottom:6px}
+.subtitle{font-size:15px;opacity:0.92}
+
+/* CARDS */
+.card{background:var(--card);border-radius:20px;padding:30px;box-shadow:0 10px 40px rgba(0,0,0,0.06);margin-bottom:18px;border:1px solid var(--border)}
+.card h2{font-family:'Playfair Display',serif;color:var(--primary-dark);font-size:24px;margin-bottom:8px}
+.card .card-desc{color:var(--muted);margin-bottom:20px;font-size:14px}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:20px;background:#fff;padding:8px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.04);overflow-x:auto}
+.tab{flex:1;min-width:130px;padding:12px 16px;text-align:center;cursor:pointer;border-radius:10px;font-weight:600;font-size:14px;color:var(--muted);transition:all 0.3s;background:transparent;border:none;font-family:inherit}
+.tab.active{background:var(--gradient);color:#fff;box-shadow:0 4px 12px rgba(11,74,162,0.25)}
+.tab:hover:not(.active){background:#f1f5f9;color:var(--primary)}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:14px}
+.form-group.full{grid-column:1/-1}
+label{display:block;font-weight:600;color:var(--primary-dark);margin-bottom:6px;font-size:13px}
+label .req{color:var(--error)}
+input,select,textarea{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;transition:all 0.3s;background:#fff}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(11,74,162,0.08)}
+textarea{min-height:80px;resize:vertical}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+
+/* BOTÕES */
+.btn{display:inline-block;padding:14px 32px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.3s;font-family:inherit;text-decoration:none}
+.btn-primary{background:var(--gradient);color:#fff;box-shadow:0 8px 20px rgba(11,74,162,0.25)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(11,74,162,0.35)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.btn-secondary{background:#f1f5f9;color:var(--primary-dark);border:1px solid var(--border)}
+.btn-secondary:hover{background:#e2e8f0}
+.btn-success{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 8px 20px rgba(22,163,74,0.3)}
+.btn-success:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(22,163,74,0.4)}
+.btn-danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff}
+.btn-block{width:100%}
+.btn-sm{padding:10px 18px;font-size:13px}
+
+/* PROGRESS */
+.progress-wrap{position:sticky;top:0;background:rgba(240,247,255,0.95);backdrop-filter:blur(10px);padding:14px 0;margin-bottom:18px;z-index:10;border-radius:12px}
+.progress-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px;color:var(--muted);font-weight:600}
+.progress-info strong{color:var(--primary-dark);font-size:16px}
+.progress-bar{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:5px;transition:width 0.5s ease;width:0%}
+
+/* DIMENSION HEADER */
+.dim-header{background:linear-gradient(135deg,#f1f5f9,#e0f2fe);border-radius:16px;padding:20px 24px;margin-bottom:16px;border-left:5px solid var(--primary)}
+.dim-header .dim-num{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--primary);font-weight:700;margin-bottom:4px}
+.dim-header .dim-name{font-family:'Playfair Display',serif;font-size:22px;color:var(--primary-dark);font-weight:600}
+.dim-header .dim-desc{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* QUESTION */
+.question{background:#fff;border-radius:14px;padding:22px;margin-bottom:14px;border:1px solid var(--border);transition:all 0.3s}
+.question.answered{border-color:var(--success);background:linear-gradient(to right,#f0fdf4,#fff 8%)}
+.q-num{font-size:11px;color:var(--primary);font-weight:800;letter-spacing:0.15em;margin-bottom:6px}
+.q-text{font-size:16px;color:var(--text);margin-bottom:8px;font-weight:500;line-height:1.5}
+.q-quote{font-style:italic;color:var(--muted);font-size:13px;border-left:3px solid var(--accent);padding:6px 0 6px 12px;margin:10px 0 16px;background:linear-gradient(to right,#fffbeb,transparent);border-radius:0 6px 6px 0}
+.q-quote strong{color:var(--primary-dark);font-style:normal}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.scale-item{padding:12px 6px;border:2px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fff;font-size:12px;font-weight:600;color:var(--muted)}
+.scale-item:hover{border-color:var(--primary-light);transform:translateY(-2px)}
+.scale-item.selected{background:var(--gradient);color:#fff;border-color:var(--primary);box-shadow:0 6px 16px rgba(11,74,162,0.3)}
+.scale-item .num{display:block;font-size:18px;font-weight:900;margin-bottom:2px}
+@media(max-width:600px){.scale-item{padding:10px 4px;font-size:10px}.scale-item .num{font-size:16px}.container{padding:16px 10px}.card{padding:22px 18px}.title{font-size:24px}}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:18px}
+.metric{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border);text-align:center}
+.metric .icon{font-size:32px;margin-bottom:6px}
+.metric .label{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+.metric .value{font-size:32px;font-weight:900;color:var(--primary-dark)}
+.metric .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.metric.success .value{color:var(--success)}
+.metric.warning .value{color:var(--warning)}
+
+/* CODE BOX */
+.code-box{background:linear-gradient(135deg,#063b7a,#0b63ce);color:#fff;padding:24px;border-radius:14px;text-align:center;margin:14px 0}
+.code-box .code-label{font-size:12px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.85;font-weight:700}
+.code-box .code-value{font-size:36px;font-weight:900;letter-spacing:0.15em;margin:8px 0}
+.code-box .code-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+
+/* CHART CONTAINER */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:768px){.chart-grid{grid-template-columns:1fr}}
+.chart-card{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border)}
+.chart-card h3{font-family:'Playfair Display',serif;color:var(--primary-dark);font-size:18px;margin-bottom:14px;text-align:center}
+.chart-wrap{position:relative;height:280px}
+
+/* COMPARATIVO */
+.dim-compare{background:#fff;border-radius:14px;padding:18px;margin-bottom:12px;border:1px solid var(--border)}
+.dim-compare .dim-name{font-weight:700;color:var(--primary-dark);margin-bottom:10px;font-size:15px}
+.dim-compare .bars{display:grid;grid-template-columns:90px 1fr 50px;gap:10px;align-items:center;margin-bottom:6px;font-size:13px}
+.dim-compare .bar-label{color:var(--muted);font-weight:600}
+.dim-compare .bar-track{height:18px;background:#f1f5f9;border-radius:9px;overflow:hidden}
+.dim-compare .bar-fill{height:100%;border-radius:9px;transition:width 0.6s ease}
+.dim-compare .bar-fill.self{background:linear-gradient(90deg,var(--primary),var(--primary-light))}
+.dim-compare .bar-fill.others{background:linear-gradient(90deg,var(--accent),#fbbf24)}
+.dim-compare .bar-value{font-weight:800;text-align:right;color:var(--primary-dark)}
+
+/* INSIGHT BOX */
+.insight{padding:16px 20px;border-radius:12px;margin-bottom:12px;border-left:5px solid}
+.insight.success{background:#f0fdf4;border-color:var(--success);color:#14532d}
+.insight.warning{background:#fffbeb;border-color:var(--warning);color:#78350f}
+.insight.info{background:#eff6ff;border-color:var(--primary);color:#1e3a8a}
+.insight strong{display:block;margin-bottom:4px;font-size:15px}
+
+/* ALERT */
+.alert{padding:14px 18px;border-radius:10px;margin-bottom:14px;font-size:14px;font-weight:500;display:none}
+.alert.show{display:block;animation:slideIn 0.3s}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.alert-error{background:#fef2f2;color:#991b1b;border-left:4px solid var(--error)}
+.alert-success{background:#f0fdf4;color:#166534;border-left:4px solid var(--success)}
+.alert-info{background:#eff6ff;color:#1e40af;border-left:4px solid var(--primary)}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal.active{display:flex}
+.modal-content{background:#fff;border-radius:20px;padding:32px;max-width:440px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,0.3);animation:modalIn 0.3s;max-height:90vh;overflow-y:auto}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-content h3{font-family:'Playfair Display',serif;color:var(--primary-dark);font-size:22px;margin-bottom:8px}
+.modal-content p{color:var(--muted);margin-bottom:18px;font-size:14px}
+.modal-actions{display:flex;gap:10px;margin-top:14px}
+.modal-actions .btn{flex:1;padding:12px}
+
+/* SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* USER HEADER */
+.user-header{background:#fff;border-radius:14px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.user-info strong{color:var(--primary-dark);font-size:16px}
+.user-info span{color:var(--muted);font-size:13px;display:block}
+
+/* FOOTER */
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+
+/* HIDDEN */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">Impulso IE™</div>
+    <h1 class="title">IGA 360° — Painel do Avaliado</h1>
+    <p class="subtitle">Índice de Autoestima · Sua jornada de autoconhecimento começa aqui ✨</p>
+  </div>
+
+  <!-- ALERT GLOBAL -->
+  <div id="alertBox" class="alert"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TELA DE ENTRADA: NOVO CADASTRO ou LOGIN                -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="screenEntry" class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchEntryTab('register',this)">🆕 Novo Cadastro</button>
+      <button class="tab" onclick="switchEntryTab('login',this)">🔐 Já tenho conta</button>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="entryRegister">
+      <h2>Comece sua jornada IGA 360°</h2>
+      <p class="card-desc">Cadastre-se uma única vez. Você receberá um <strong>código IGA-XXXXX</strong> para compartilhar com seus avaliadores.</p>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome completo <span class="req">*</span></label>
+          <input type="text" id="regName" placeholder="Seu nome">
+        </div>
+        <div class="form-group">
+          <label>E-mail <span class="req">*</span></label>
+          <input type="email" id="regEmail" placeholder="seu@email.com">
+        </div>
+        <div class="form-group">
+          <label>WhatsApp <span class="req">*</span></label>
+          <input type="tel" id="regWhats" placeholder="(11) 99999-9999">
+        </div>
+        <div class="form-group">
+          <label>PIN (4 dígitos) <span class="req">*</span></label>
+          <input type="password" id="regPin" placeholder="****" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label>Empresa</label>
+          <input type="text" id="regCompany" placeholder="Onde trabalha">
+        </div>
+        <div class="form-group">
+          <label>Cargo</label>
+          <input type="text" id="regPosition" placeholder="Sua função">
+        </div>
+        <div class="form-group">
+          <label>Nível</label>
+          <select id="regLevel">
+            <option value="">Selecione...</option>
+            <option>Estagiário/Trainee</option>
+            <option>Operacional</option>
+            <option>Coordenador</option>
+            <option>Gerente</option>
+            <option>Diretor</option>
+            <option>C-Level / Sócio</option>
+            <option>Empreendedor</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tamanho da equipe</label>
+          <select id="regTeam">
+            <option value="">Selecione...</option>
+            <option>Sem equipe</option>
+            <option>1-5 pessoas</option>
+            <option>6-15 pessoas</option>
+            <option>16-50 pessoas</option>
+            <option>50+ pessoas</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Anos de experiência em liderança</label>
+          <select id="regExp">
+            <option value="">Selecione...</option>
+            <option>Menos de 1 ano</option>
+            <option>1-3 anos</option>
+            <option>4-7 anos</option>
+            <option>8-15 anos</option>
+            <option>15+ anos</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="iniciarAutoavaliacao()" style="margin-top:12px">
+        <span id="regBtnText">Continuar para Autoavaliação →</span>
+      </button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="entryLogin" class="hidden">
+      <h2>Acesse seu painel</h2>
+      <p class="card-desc">Entre com o e-mail e PIN cadastrados.</p>
+      
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="loginEmail" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <label>PIN</label>
+        <input type="password" id="loginPin" placeholder="****" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="fazerLogin()" style="margin-top:8px">
+        <span id="loginBtnText">Entrar →</span>
+      </button>
+      
+      <div style="text-align:center;margin-top:14px">
+        <a href="#" onclick="abrirRecuperacao(event)" style="color:var(--primary);text-decoration:none;font-weight:600;font-size:13px">
+          🔑 Esqueci meu PIN
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TELA DE AUTOAVALIAÇÃO                                  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="screenSelf" class="hidden">
+    <div class="card">
+      <h2>📝 Sua Autoavaliação IGA 360°</h2>
+      <p class="card-desc">Responda com honestidade — esta é a base do seu autoconhecimento. <strong>40 perguntas em 5 dimensões.</strong></p>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span>Progresso</span>
+        <span><strong id="selfProgressNum">0</strong> / 40 perguntas</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="selfProgressFill"></div></div>
+    </div>
+
+    <div id="selfQuestionsContainer"></div>
+
+    <div class="card">
+      <div class="form-group">
+        <label>💎 Pontos Fortes (autopercepção)</label>
+        <textarea id="selfStrengths" placeholder="Quais são as maiores forças que você reconhece em si?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>🎯 Pontos de Melhoria</label>
+        <textarea id="selfImprovements" placeholder="O que você gostaria de desenvolver em si?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>✨ Impacto que deseja causar</label>
+        <textarea id="selfImpact" placeholder="Como você quer impactar o mundo ao seu redor?"></textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-success btn-block" onclick="finalizarCadastro()" style="font-size:17px;padding:18px;margin-bottom:30px">
+      <span id="selfSubmitText">🚀 Finalizar Cadastro e Receber Meu Código</span>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TELA DASHBOARD                                         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="screenDash" class="hidden">
+    
+    <!-- USER HEADER -->
+    <div class="user-header">
+      <div class="user-info">
+        <strong id="dashName">—</strong>
+        <span id="dashEmail">—</span>
+      </div>
+      <div>
+        <button class="btn btn-secondary btn-sm" onclick="logout()">🚪 Sair</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchDashTab('overview',this)">📊 Visão Geral</button>
+      <button class="tab" onclick="switchDashTab('share',this)">📱 Compartilhar</button>
+      <button class="tab" onclick="switchDashTab('results',this)">🎯 Resultados 360°</button>
+      <button class="tab" onclick="switchDashTab('settings',this)">⚙️ Configurações</button>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div id="tabOverview">
+      <div class="dash-grid">
+        <div class="metric">
+          <div class="icon">📩</div>
+          <div class="label">Avaliações</div>
+          <div class="value" id="metricCount">0</div>
+          <div class="sub">de até 30</div>
+        </div>
+        <div class="metric" id="metricStatusBox">
+          <div class="icon" id="metricStatusIcon">⏳</div>
+          <div class="label">Status</div>
+          <div class="value" id="metricStatus" style="font-size:18px">—</div>
+          <div class="sub" id="metricStatusSub">—</div>
+        </div>
+        <div class="metric">
+          <div class="icon">🎯</div>
+          <div class="label">Sua Autoestima</div>
+          <div class="value" id="metricSelfScore">—</div>
+          <div class="sub">índice IGA</div>
+        </div>
+        <div class="metric">
+          <div class="icon">🌐</div>
+          <div class="label">Percepção Externa</div>
+          <div class="value" id="metricOthersScore">—</div>
+          <div class="sub">média 360°</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📈 Progresso da Coleta</h2>
+        <p class="card-desc">Acompanhe quantas pessoas já responderam sua avaliação.</p>
+        <div style="margin-top:14px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span><strong id="overviewCount">0</strong> de 30 avaliações</span>
+            <span style="color:var(--muted)" id="overviewPct">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="overviewBar"></div></div>
+          <p style="margin-top:10px;color:var(--muted);font-size:13px" id="overviewMsg">Compartilhe seu código para começar a receber avaliações.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SHARE -->
+    <div id="tabShare" class="hidden">
+      <div class="card">
+        <h2>📱 Compartilhe seu código</h2>
+        <p class="card-desc">Envie para no mínimo <strong>3</strong> e no máximo <strong>30</strong> pessoas que te conhecem bem (família, amigos, colegas, líderes, liderados).</p>
+        
+        <div class="code-box">
+          <div class="code-label">Seu Código Único</div>
+          <div class="code-value" id="shareCode">IGA-XXXXX</div>
+          <div class="code-actions">
+            <button class="btn btn-success btn-sm" onclick="compartilharWhatsApp()">📱 WhatsApp</button>
+            <button class="btn btn-secondary btn-sm" onclick="copiarLink()">🔗 Copiar Link</button>
+            <button class="btn btn-secondary btn-sm" onclick="copiarCodigo()">📋 Copiar Código</button>
+          </div>
+        </div>
+
+        <div class="insight info">
+          <strong>💡 Dica de Ouro</strong>
+          Quanto mais diversidade entre seus avaliadores (relações diferentes), mais rico e revelador será seu Relatório 360°.
+        </div>
+
+        <h3 style="margin-top:20px;color:var(--primary-dark);font-family:'Playfair Display',serif;font-size:18px">🔗 Link direto para os avaliadores:</h3>
+        <div style="background:#f1f5f9;padding:12px;border-radius:10px;margin-top:10px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--primary-dark);border:1px solid var(--border)" id="shareLink">—</div>
+      </div>
+    </div>
+
+    <!-- TAB: RESULTS 360° -->
+    <div id="tabResults" class="hidden">
+      <div id="resultsLocked" class="card">
+        <h2>🔒 Relatório 360° Bloqueado</h2>
+        <p class="card-desc">Você precisa de no mínimo <strong>3 avaliações</strong> para liberar seu Relatório 360° completo.</p>
+        <div class="insight warning">
+          <strong>⏳ Faltam <span id="resultsRemaining">3</span> avaliações</strong>
+          Compartilhe seu código com mais pessoas para desbloquear comparativos, gráficos radar, pontos cegos e PDI personalizado.
+        </div>
+        <button class="btn btn-primary" onclick="switchDashTab('share',document.querySelectorAll('.tab')[1])">📱 Ir para Compartilhar</button>
+      </div>
+
+      <div id="resultsUnlocked" class="hidden">
+        <div class="card">
+          <h2>🎯 Seu Relatório 360°</h2>
+          <p class="card-desc">Comparativo entre sua <strong>autopercepção</strong> e a <strong>percepção dos outros</strong> em 5 dimensões da autoestima.</p>
+          
+          <div class="chart-grid">
+            <div class="chart-card">
+              <h3>📊 Radar Comparativo</h3>
+              <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+              <h3>🎨 Distribuição por Dimensão</h3>
+              <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📐 Análise por Dimensão</h2>
+          <p class="card-desc">Compare seu olhar com o olhar dos outros em cada dimensão.</p>
+          <div id="dimComparison"></div>
+        </div>
+
+        <div class="card">
+          <h2>💡 Insights & Pontos Cegos</h2>
+          <div id="insightsContainer"></div>
+        </div>
+
+        <div class="card">
+          <h2>📥 Baixar Relatório PDF</h2>
+          <p class="card-desc">Receba o relatório completo em PDF (também enviado para seu e-mail).</p>
+          <button class="btn btn-success btn-block" onclick="gerarPDF360()" style="font-size:17px;padding:18px">
+            <span id="pdfBtnText">📄 Gerar e Enviar Relatório PDF</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SETTINGS -->
+    <div id="tabSettings" class="hidden">
+      <div class="card">
+        <h2>⚙️ Configurações</h2>
+        <p class="card-desc">Gerencie sua avaliação 360°.</p>
+        
+        <div style="margin-top:14px">
+          <h3 style="color:var(--primary-dark);margin-bottom:8px;font-size:16px">📄 Reenviar PDF da autoavaliação</h3>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Receba novamente o PDF da sua autoavaliação por e-mail.</p>
+          <button class="btn btn-secondary" onclick="gerarPDFAuto()">📧 Reenviar PDF</button>
+        </div>
+
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+          <h3 style="color:var(--error);margin-bottom:8px;font-size:16px">🔒 Encerrar Avaliação</h3>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:10px">
+            Encerra o recebimento de novas avaliações. <strong>Esta ação não pode ser desfeita.</strong> 
+            Você ainda poderá ver os resultados já recebidos.
+          </p>
+          <button class="btn btn-danger" onclick="confirmarEncerramento()">🔒 Encerrar Avaliação 360°</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p>✨ Impulso IE™ | IGA 360° — Índice de Autoestima</p>
+    <p>Rogério Braga · Instituto Impulso Coaching de Liderança</p>
+  </div>
+</div>
+
+<!-- MODAL RECUPERAÇÃO DE PIN -->
+<div id="recoveryModal" class="modal">
+  <div class="modal-content">
+    <h3>🔑 Recuperar PIN</h3>
+    <p>Digite seu e-mail cadastrado. Enviaremos seu PIN diretamente para sua caixa de entrada.</p>
+    <input type="email" id="recoveryEmail" placeholder="seu@email.com">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharRecuperacao()">Cancelar</button>
+      <button class="btn btn-primary" onclick="recuperarPin()">
+        <span id="recoveryBtnText">Enviar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ENCERRAMENTO -->
+<div id="closeModal" class="modal">
+  <div class="modal-content">
+    <h3>⚠️ Encerrar Avaliação?</h3>
+    <p>Após encerrar, <strong>nenhuma nova avaliação será aceita</strong>. Esta ação é irreversível.</p>
+    <p style="color:var(--error);font-weight:600">Tem certeza que deseja continuar?</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="document.getElementById('closeModal').classList.remove('active')">Cancelar</button>
+      <button class="btn btn-danger" onclick="encerrarAvaliacao()">Sim, Encerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║                  ⚙️  CONFIGURAÇÃO                        ║
+// ╚══════════════════════════════════════════════════════════╝
+const API_URL = 'https://script.google.com/macros/s/AKfycbwK2vbptHsg3dT4AGQT2ZLL8Tl2M7HO6oAiP68mr5kwtJfWgxWivjTX1_llkk97b7-a/exec';
+const API_KEY = '2026Impulso$';
+const CONVIDADO_URL = 'https://impulsoflow.github.io/IGA360Convidado/';
+
+// Estado
+let currentLeader = null;
+let selfRespostas = new Array(40).fill(null);
+let pendingRegistration = null;
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║       📚  40 PERGUNTAS + CITAÇÕES (5 dimensões)          ║
+// ╚══════════════════════════════════════════════════════════╝
+const DIMENSOES = [
+  {
+    nome: "Autoaceitação",
+    desc: "Capacidade de se aceitar com qualidades e limitações",
+    perguntas: [
+      { q: "Aceito quem sou, com minhas qualidades e limitações.", c: "A coragem de ser imperfeito é o que nos aproxima dos outros.", a: "Brené Brown" },
+      { q: "Lido bem com meus erros sem me autocondenar excessivamente.", c: "Compaixão é tratar a si mesmo como você trataria um amigo querido.", a: "Kristin Neff" },
+      { q: "Reconheço minhas conquistas sem precisar de validação externa.", c: "Tornar-se quem você é exige a coragem de se conhecer.", a: "Carl Rogers" },
+      { q: "Aceito feedback negativo sem me desestabilizar emocionalmente.", c: "Quem olha para fora sonha; quem olha para dentro desperta.", a: "Carl Jung" },
+      { q: "Demonstro paz com meu corpo e minha aparência.", c: "Aceitar é o primeiro ato de amor por si mesmo.", a: "Augusto Cury" },
+      { q: "Não busco aprovação constante para me sentir bem comigo.", c: "Liberdade é a ausência da necessidade de aprovação.", a: "Pablo Marçal" },
+      { q: "Permito-me sentir emoções difíceis sem me julgar por elas.", c: "Você não é o que sente — você é quem sente.", a: "Tiago Brunet" },
+      { q: "Trato a mim mesmo com gentileza nos momentos de fracasso.", c: "Autocompaixão não é fraqueza, é maturidade emocional.", a: "Kristin Neff" }
+    ]
+  },
+  {
+    nome: "Autoconfiança",
+    desc: "Crença na própria capacidade de enfrentar desafios",
+    perguntas: [
+      { q: "Acredito na minha capacidade de enfrentar desafios.", c: "Quem tem um porquê enfrenta qualquer como.", a: "Viktor Frankl" },
+      { q: "Tomo decisões com clareza, mesmo em situações de incerteza.", c: "A coragem não é a ausência de medo, mas o triunfo sobre ele.", a: "Nelson Mandela" },
+      { q: "Defendo minhas opiniões com firmeza e respeito.", c: "Quem se respeita ensina o mundo a respeitá-lo.", a: "Paulo Vieira" },
+      { q: "Confio na minha intuição em momentos importantes.", c: "Os marcadores somáticos guiam decisões sábias.", a: "António Damásio" },
+      { q: "Encaro o novo com curiosidade, não com medo.", c: "A mentalidade de crescimento transforma desafios em trampolins.", a: "Carol Dweck" },
+      { q: "Sinto-me preparado(a) para conduzir projetos importantes.", c: "Confiança é construída com pequenas vitórias diárias.", a: "Tiago Giordano" },
+      { q: "Não desisto facilmente diante das primeiras dificuldades.", c: "A persistência é o caminho do êxito.", a: "Charles Chaplin" },
+      { q: "Confio em mim para aprender o que ainda não sei.", c: "Você é capaz de muito mais do que imagina ser.", a: "Roberto Marques" }
+    ]
+  },
+  {
+    nome: "Autoconsciência",
+    desc: "Capacidade de reconhecer emoções, motivações e padrões",
+    perguntas: [
+      { q: "Reconheço com clareza o que sinto em diferentes situações.", c: "A inteligência emocional começa pela consciência de si.", a: "Daniel Goleman" },
+      { q: "Identifico gatilhos emocionais que me afetam.", c: "Conhecer-se é o início de toda sabedoria.", a: "Aristóteles" },
+      { q: "Percebo quando meu humor afeta os outros ao redor.", c: "Suas emoções são contagiosas — escolha bem o que espalha.", a: "Daniel Goleman" },
+      { q: "Reflito sobre minhas atitudes antes de reagir impulsivamente.", c: "Entre estímulo e resposta há um espaço — nele está a liberdade.", a: "Viktor Frankl" },
+      { q: "Conheço meus valores e ajo coerentemente com eles.", c: "Viver com propósito é viver alinhado com seus valores.", a: "Abraham Maslow" },
+      { q: "Reconheço padrões comportamentais que se repetem na minha vida.", c: "Até que você torne consciente o inconsciente, ele dirigirá sua vida.", a: "Carl Jung" },
+      { q: "Percebo a diferença entre o que sinto e o que penso.", c: "Pensamentos não são fatos — observe-os com curiosidade.", a: "Rick Hanson" },
+      { q: "Sei nomear minhas emoções com precisão.", c: "Nomear é domesticar. O que tem nome perde o poder de assombrar.", a: "Augusto Cury" }
+    ]
+  },
+  {
+    nome: "Autorrespeito",
+    desc: "Capacidade de estabelecer limites e honrar a si mesmo",
+    perguntas: [
+      { q: "Estabeleço limites saudáveis em meus relacionamentos.", c: "Dizer 'não' a outros é dizer 'sim' a si mesmo.", a: "Nathaniel Branden" },
+      { q: "Não permito que outros desrespeitem minhas necessidades.", c: "Você ensina aos outros como te tratar pelo que tolera.", a: "Tony Gaskins" },
+      { q: "Comunico-me com assertividade, sem agressividade nem submissão.", c: "Comunicação não-violenta é um caminho para a conexão verdadeira.", a: "Marshall Rosenberg" },
+      { q: "Honro meus compromissos comigo mesmo(a).", c: "A integridade é fazer o certo mesmo quando ninguém está olhando.", a: "C. S. Lewis" },
+      { q: "Cuido da minha saúde física e mental como prioridade.", c: "Você não pode servir de uma jarra vazia.", a: "Eleanor Brownn" },
+      { q: "Reconheço quando preciso me afastar de pessoas tóxicas.", c: "Soltar não é desistir — é escolher seu próprio bem-estar.", a: "Tiago Brunet" },
+      { q: "Mantenho minha dignidade mesmo em situações de conflito.", c: "Mantenha sua dignidade — ela é sua maior posse.", a: "Maya Angelou" },
+      { q: "Cobro de mim mesmo(a) com firmeza, mas sem crueldade.", c: "Disciplina é amor próprio em ação.", a: "Pablo Marçal" }
+    ]
+  },
+  {
+    nome: "Autorrealização",
+    desc: "Vivência de propósito, sentido e expressão do potencial",
+    perguntas: [
+      { q: "Vivo em coerência com meu propósito de vida.", c: "O sentido da vida é dar sentido à vida.", a: "Viktor Frankl" },
+      { q: "Sinto-me realizado(a) com o que faço profissionalmente.", c: "A autorrealização é o topo da hierarquia humana.", a: "Abraham Maslow" },
+      { q: "Tenho sonhos claros e ajo para concretizá-los.", c: "Sonhos sem ação são apenas alucinações.", a: "Roberto Marques" },
+      { q: "Celebro pequenas vitórias do meu cotidiano.", c: "Cultive a gratidão — ela rebobina o cérebro para a felicidade.", a: "Rick Hanson" },
+      { q: "Sinto que estou em constante evolução pessoal.", c: "Quem para de aprender, para de viver plenamente.", a: "Tiago Giordano" },
+      { q: "Inspiro outras pessoas pela forma como vivo.", c: "Seu exemplo silencioso fala mais que mil palavras.", a: "Albert Schweitzer" },
+      { q: "Encontro significado mesmo em momentos difíceis.", c: "Em todas as coisas, há sentido — basta escolher buscá-lo.", a: "Viktor Frankl" },
+      { q: "Vivo com leveza, mesmo carregando responsabilidades.", c: "A vida é uma dança — leve e séria ao mesmo tempo.", a: "Paulo Vieira" }
+    ]
+  }
+];
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              🎬  INICIALIZAÇÃO                           ║
+// ╚══════════════════════════════════════════════════════════╝
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('iga_leader');
+  if (saved) {
+    try {
+      currentLeader = JSON.parse(saved);
+      mostrarDashboard();
+    } catch (e) { localStorage.removeItem('iga_leader'); }
+  }
+});
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              🔀  TROCAR ABAS                             ║
+// ╚══════════════════════════════════════════════════════════╝
+function switchEntryTab(tab, btn) {
+  document.querySelectorAll('#screenEntry .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('entryRegister').classList.toggle('hidden', tab !== 'register');
+  document.getElementById('entryLogin').classList.toggle('hidden', tab !== 'login');
+}
+
+function switchDashTab(tab, btn) {
+  document.querySelectorAll('#screenDash .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['Overview','Share','Results','Settings'].forEach(t => {
+    document.getElementById('tab' + t).classList.toggle('hidden', tab !== t.toLowerCase());
+  });
+  if (tab === 'results' && currentLeader && currentLeader.evaluatorCount >= 3) {
+    setTimeout(() => renderResults360(), 100);
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              📝  CADASTRO + AUTOAVALIAÇÃO                ║
+// ╚══════════════════════════════════════════════════════════╝
+function iniciarAutoavaliacao() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const whats = document.getElementById('regWhats').value.trim();
+  const pin = document.getElementById('regPin').value.trim();
+  
+  if (!name || name.length < 3) return showAlert('Digite seu nome completo.', 'error');
+  if (!email || !email.includes('@')) return showAlert('Digite um e-mail válido.', 'error');
+  if (!whats || whats.length < 10) return showAlert('Digite um WhatsApp válido.', 'error');
+  if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) return showAlert('PIN deve ter exatamente 4 dígitos numéricos.', 'error');
+
+  pendingRegistration = {
+    name, email, whatsapp: whats, pin,
+    company: document.getElementById('regCompany').value.trim(),
+    position: document.getElementById('regPosition').value.trim(),
+    level: document.getElementById('regLevel').value,
+    teamSize: document.getElementById('regTeam').value,
+    experience: document.getElementById('regExp').value,
+    code: gerarCodigoIGA()
+  };
+
+  document.getElementById('screenEntry').classList.add('hidden');
+  document.getElementById('screenSelf').classList.remove('hidden');
+  renderSelfPerguntas();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function gerarCodigoIGA() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = 'IGA-';
+  for (let i = 0; i < 5; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+  return result;
+}
+
+function renderSelfPerguntas() {
+  const container = document.getElementById('selfQuestionsContainer');
+  let html = '';
+  let qIndex = 0;
+
+  DIMENSOES.forEach((dim, dIdx) => {
+    html += `
+      <div class="dim-header">
+        <div class="dim-num">Dimensão ${dIdx + 1} de 5</div>
+        <div class="dim-name">${dim.nome}</div>
+        <div class="dim-desc">${dim.desc}</div>
+      </div>`;
+    dim.perguntas.forEach((p) => {
+      const idx = qIndex;
+      html += `
+        <div class="question" id="sq-${idx}">
+          <div class="q-num">PERGUNTA ${idx + 1}</div>
+          <div class="q-text">${p.q}</div>
+          <div class="q-quote">"${p.c}" <strong>— ${p.a}</strong></div>
+          <div class="scale">
+            ${[1,2,3,4,5].map(v => `
+              <div class="scale-item" onclick="selecionarSelf(${idx},${v})">
+                <span class="num">${v}</span>${labelEscala(v)}
+              </div>`).join('')}
+          </div>
+        </div>`;
+      qIndex++;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function labelEscala(v) {
+  return ['Discordo<br>totalmente','Discordo','Neutro','Concordo','Concordo<br>totalmente'][v - 1];
+}
+
+function selecionarSelf(idx, valor) {
+  selfRespostas[idx] = valor;
+  const card = document.getElementById(`sq-${idx}`);
+  card.classList.add('answered');
+  card.querySelectorAll('.scale-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === valor - 1);
+  });
+  const respondidas = selfRespostas.filter(r => r !== null).length;
+  document.getElementById('selfProgressNum').textContent = respondidas;
+  document.getElementById('selfProgressFill').style.width = (respondidas / 40 * 100) + '%';
+}
+
+async function finalizarCadastro() {
+  const respondidas = selfRespostas.filter(r => r !== null).length;
+  if (respondidas < 40) {
+    showAlert(`Faltam ${40 - respondidas} perguntas.`, 'error');
+    const idx = selfRespostas.findIndex(r => r === null);
+    if (idx >= 0) document.getElementById(`sq-${idx}`).scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  const btn = document.getElementById('selfSubmitText');
+  btn.innerHTML = '<span class="spinner"></span>Salvando...';
+
+  pendingRegistration.selfAssessment = {
+    responses: selfRespostas,
+    strengths: document.getElementById('selfStrengths').value.trim(),
+    improvements: document.getElementById('selfImprovements').value.trim(),
+    impact: document.getElementById('selfImpact').value.trim()
+  };
+
+  try {
+    const pdfBase64 = await gerarPDFAutoBase64(pendingRegistration);
+    
+    const payload = {
+      apiKey: API_KEY,
+      action: 'createLeader',
+      leader: pendingRegistration,
+      pdfBase64: pdfBase64,
+      pdfFileName: `IGA_Auto_${pendingRegistration.code}.pdf`
+    };
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      currentLeader = {
+        ...pendingRegistration,
+        status: 'active',
+        evaluatorCount: 0,
+        evaluations: []
+      };
+      localStorage.setItem('iga_leader', JSON.stringify(currentLeader));
+      showAlert('🎉 Cadastro concluído! Verifique seu e-mail.', 'success');
+      setTimeout(() => mostrarDashboard(), 1500);
+    } else {
+      showAlert(data.error || 'Erro ao cadastrar', 'error');
+      btn.innerHTML = '🚀 Finalizar Cadastro e Receber Meu Código';
+    }
+  } catch (err) {
+    showAlert('Erro de conexão.', 'error');
+    btn.innerHTML = '🚀 Finalizar Cadastro e Receber Meu Código';
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                    🔐  LOGIN                             ║
+// ╚══════════════════════════════════════════════════════════╝
+async function fazerLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pin = document.getElementById('loginPin').value.trim();
+  const btn = document.getElementById('loginBtnText');
+  
+  if (!email || !pin) return showAlert('Preencha e-mail e PIN.', 'error');
+  
+  btn.innerHTML = '<span class="spinner"></span>Entrando...';
+  
+  try {
+    const url = `${API_URL}?action=loginAvaliado&apiKey=${encodeURIComponent(API_KEY)}&email=${encodeURIComponent(email)}&pin=${encodeURIComponent(pin)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.ok) {
+      currentLeader = data.leader;
+      localStorage.setItem('iga_leader', JSON.stringify(currentLeader));
+      mostrarDashboard();
+    } else {
+      showAlert(data.error || 'Login falhou', 'error');
+      btn.innerHTML = 'Entrar →';
+    }
+  } catch (err) {
+    showAlert('Erro de conexão.', 'error');
+    btn.innerHTML = 'Entrar →';
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                  📊  DASHBOARD                           ║
+// ╚══════════════════════════════════════════════════════════╝
+async function mostrarDashboard() {
+  document.getElementById('screenEntry').classList.add('hidden');
+  document.getElementById('screenSelf').classList.add('hidden');
+  document.getElementById('screenDash').classList.remove('hidden');
+  
+  // Atualiza dados via API (refresh)
+  await refreshLeaderData();
+  renderDashboard();
+}
+
+async function refreshLeaderData() {
+  if (!currentLeader) return;
+  try {
+    const url = `${API_URL}?action=loginAvaliado&apiKey=${encodeURIComponent(API_KEY)}&email=${encodeURIComponent(currentLeader.email)}&pin=${encodeURIComponent(currentLeader.pin)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.ok) {
+      currentLeader = data.leader;
+      localStorage.setItem('iga_leader', JSON.stringify(currentLeader));
+    }
+  } catch (e) { console.warn('Refresh falhou:', e); }
+}
+
+function renderDashboard() {
+  const l = currentLeader;
+  document.getElementById('dashName').textContent = l.name;
+  document.getElementById('dashEmail').textContent = l.email;
+  document.getElementById('shareCode').textContent = l.code;
+  document.getElementById('shareLink').textContent = `${CONVIDADO_URL}?codigo=${l.code}`;
+  
+  // Métricas
+  document.getElementById('metricCount').textContent = l.evaluatorCount || 0;
+  document.getElementById('overviewCount').textContent = l.evaluatorCount || 0;
+  document.getElementById('overviewPct').textContent = Math.round(((l.evaluatorCount || 0) / 30) * 100) + '%';
+  document.getElementById('overviewBar').style.width = ((l.evaluatorCount || 0) / 30 * 100) + '%';
+  
+  // Status
+  const count = l.evaluatorCount || 0;
+  const closed = l.status === 'closed';
+  const statusEl = document.getElementById('metricStatus');
+  const statusSubEl = document.getElementById('metricStatusSub');
+  const statusIconEl = document.getElementById('metricStatusIcon');
+  
+  if (closed) {
+    statusEl.textContent = 'Encerrada';
+    statusSubEl.textContent = 'avaliação fechada';
+    statusIconEl.textContent = '🔒';
+  } else if (count >= 3) {
+    statusEl.textContent = 'Liberado';
+    statusSubEl.textContent = 'relatório disponível';
+    statusIconEl.textContent = '✅';
+  } else {
+    statusEl.textContent = `${3 - count} pra liberar`;
+    statusSubEl.textContent = 'mínimo: 3 avaliações';
+    statusIconEl.textContent = '⏳';
+  }
+  
+  // Mensagem overview
+  const msgEl = document.getElementById('overviewMsg');
+  if (closed) msgEl.innerHTML = '🔒 Avaliação encerrada. Confira seus resultados na aba "Resultados 360°".';
+  else if (count === 0) msgEl.innerHTML = '📱 Vá para a aba "Compartilhar" e envie seu código aos avaliadores.';
+  else if (count < 3) msgEl.innerHTML = `⏳ Faltam <strong>${3 - count}</strong> para liberar o Relatório 360° completo.`;
+  else msgEl.innerHTML = `✅ Relatório 360° liberado! Veja na aba "Resultados 360°".`;
+  
+  // Score self
+  const selfScore = calcularMediaGeral(l.selfAssessment.responses || []);
+  document.getElementById('metricSelfScore').textContent = selfScore > 0 ? selfScore.toFixed(1) : '—';
+  
+  // Score others
+  const allOthers = (l.evaluations || []).flatMap(e => e.responses || []);
+  const othersScore = calcularMediaGeral(allOthers);
+  document.getElementById('metricOthersScore').textContent = othersScore > 0 ? othersScore.toFixed(1) : '—';
+  
+  // Results lock/unlock
+  const resultsLocked = document.getElementById('resultsLocked');
+  const resultsUnlocked = document.getElementById('resultsUnlocked');
+  if (count >= 3) {
+    resultsLocked.classList.add('hidden');
+    resultsUnlocked.classList.remove('hidden');
+  } else {
+    resultsLocked.classList.remove('hidden');
+    resultsUnlocked.classList.add('hidden');
+    document.getElementById('resultsRemaining').textContent = 3 - count;
+  }
+}
+
+function calcularMediaGeral(arr) {
+  const valid = arr.filter(v => v !== null && !isNaN(v));
+  if (!valid.length) return 0;
+  return valid.reduce((a,b) => a + Number(b), 0) / valid.length;
+}
+
+function calcularMediaPorDimensao(respostas) {
+  const result = [];
+  let idx = 0;
+  DIMENSOES.forEach(dim => {
+    const slice = respostas.slice(idx, idx + dim.perguntas.length).filter(v => v !== null && !isNaN(v));
+    const avg = slice.length ? slice.reduce((a,b) => a + Number(b), 0) / slice.length : 0;
+    result.push({ nome: dim.nome, media: avg });
+    idx += dim.perguntas.length;
+  });
+  return result;
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              📊  RENDER RESULTADOS 360°                  ║
+// ╚══════════════════════════════════════════════════════════╝
+let radarChartInst = null, barChartInst = null;
+
+function renderResults360() {
+  const l = currentLeader;
+  const selfDims = calcularMediaPorDimensao(l.selfAssessment.responses || []);
+  
+  // Média das avaliações dos outros por dimensão
+  const evals = l.evaluations || [];
+  const othersDims = DIMENSOES.map((dim, dIdx) => {
+    let total = 0, count = 0;
+    const start = dIdx * 8;
+    evals.forEach(ev => {
+      const slice = (ev.responses || []).slice(start, start + 8).filter(v => v !== null && !isNaN(v));
+      slice.forEach(v => { total += Number(v); count++; });
+    });
+    return { nome: dim.nome, media: count ? total / count : 0 };
+  });
+  
+  // RADAR
+  if (radarChartInst) radarChartInst.destroy();
+  radarChartInst = new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: DIMENSOES.map(d => d.nome),
+      datasets: [
+        {
+          label: 'Você',
+          data: selfDims.map(d => d.media),
+          backgroundColor: 'rgba(11,74,162,0.25)',
+          borderColor: '#0b4aa2',
+          borderWidth: 2,
+          pointBackgroundColor: '#0b4aa2'
+        },
+        {
+          label: 'Outros (média)',
+          data: othersDims.map(d => d.media),
+          backgroundColor: 'rgba(245,158,11,0.25)',
+          borderColor: '#f59e0b',
+          borderWidth: 2,
+          pointBackgroundColor: '#f59e0b'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { r: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } } }
+    }
+  });
+  
+  // BAR
+  if (barChartInst) barChartInst.destroy();
+  barChartInst = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: DIMENSOES.map(d => d.nome.substring(0, 12)),
+      datasets: [
+        { label: 'Você', data: selfDims.map(d => d.media), backgroundColor: '#0b4aa2' },
+        { label: 'Outros', data: othersDims.map(d => d.media), backgroundColor: '#f59e0b' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, max: 5 } }
+    }
+  });
+  
+  // COMPARAÇÃO POR DIMENSÃO
+  const compContainer = document.getElementById('dimComparison');
+  let compHtml = '';
+  selfDims.forEach((s, i) => {
+    const o = othersDims[i];
+    const diff = (s.media - o.media);
+    const diffLabel = diff > 0.5 ? '🔵 Você se vê mais positivo' : diff < -0.5 ? '🟠 Outros te veem mais positivo' : '✅ Visões alinhadas';
+    compHtml += `
+      <div class="dim-compare">
+        <div class="dim-name">${s.nome}</div>
+        <div class="bars">
+          <span class="bar-label">Você</span>
+          <div class="bar-track"><div class="bar-fill self" style="width:${s.media/5*100}%"></div></div>
+          <span class="bar-value">${s.media.toFixed(1)}</span>
+        </div>
+        <div class="bars">
+          <span class="bar-label">Outros</span>
+          <div class="bar-track"><div class="bar-fill others" style="width:${o.media/5*100}%"></div></div>
+          <span class="bar-value">${o.media.toFixed(1)}</span>
+        </div>
+        <p style="margin-top:8px;font-size:13px;color:var(--muted);font-weight:600">${diffLabel} (Δ ${Math.abs(diff).toFixed(1)})</p>
+      </div>`;
+  });
+  compContainer.innerHTML = compHtml;
+  
+  // INSIGHTS
+  const insightsContainer = document.getElementById('insightsContainer');
+  let insHtml = '';
+  selfDims.forEach((s, i) => {
+    const o = othersDims[i];
+    const diff = s.media - o.media;
+    if (Math.abs(diff) >= 1) {
+      const isBlind = diff > 0;
+      insHtml += `
+        <div class="insight ${isBlind ? 'warning' : 'success'}">
+          <strong>${isBlind ? '🎯 Possível ponto cego' : '💎 Força não reconhecida'}: ${s.nome}</strong>
+          ${isBlind 
+            ? `Você se avalia <strong>${s.media.toFixed(1)}</strong>, mas os outros te veem com <strong>${o.media.toFixed(1)}</strong>. Vale refletir sobre essa diferença.`
+            : `Os outros te veem com <strong>${o.media.toFixed(1)}</strong>, mas você se avalia em <strong>${s.media.toFixed(1)}</strong>. Reconheça essa qualidade!`}
+        </div>`;
+    }
+  });
+  if (!insHtml) {
+    insHtml = `<div class="insight info"><strong>✨ Visões alinhadas</strong>Sua autopercepção está coerente com a percepção dos outros em todas as dimensões. Continue assim!</div>`;
+  }
+  insightsContainer.innerHTML = insHtml;
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              📱  COMPARTILHAMENTO                        ║
+// ╚══════════════════════════════════════════════════════════╝
+function compartilharWhatsApp() {
+  const l = currentLeader;
+  const link = `${CONVIDADO_URL}?codigo=${l.code}`;
+  const msg = encodeURIComponent(
+    `🌟 *Convite Impulso IE™ — IGA 360°*\n\n` +
+    `Olá! Você foi convidado(a) a participar da minha avaliação de autoestima 360°.\n\n` +
+    `Sua percepção é fundamental para meu desenvolvimento. É 100% anônimo.\n\n` +
+    `📋 *Código:* ${l.code}\n` +
+    `🔗 *Link:* ${link}\n\n` +
+    `Leva ~10 minutos. Obrigado(a)! 🙏`
+  );
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+function copiarLink() {
+  const link = `${CONVIDADO_URL}?codigo=${currentLeader.code}`;
+  navigator.clipboard.writeText(link)
+    .then(() => showAlert('✅ Link copiado!', 'success'))
+    .catch(() => showAlert('Erro ao copiar.', 'error'));
+}
+
+function copiarCodigo() {
+  navigator.clipboard.writeText(currentLeader.code)
+    .then(() => showAlert(`✅ Código ${currentLeader.code} copiado!`, 'success'))
+    .catch(() => showAlert('Erro ao copiar.', 'error'));
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              📄  PDF — AUTOAVALIAÇÃO                     ║
+// ╚══════════════════════════════════════════════════════════╝
+async function gerarPDFAutoBase64(leader) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const w = pdf.internal.pageSize.getWidth();
+  const margem = 15;
+  let y = 20;
+  
+  // Capa
+  pdf.setFillColor(11, 74, 162);
+  pdf.rect(0, 0, w, 60, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(22).setFont('helvetica', 'bold');
+  pdf.text('IGA 360° — Autoavaliação', w/2, 30, { align: 'center' });
+  pdf.setFontSize(11).setFont('helvetica', 'normal');
+  pdf.text('Impulso IE™ | Índice de Autoestima', w/2, 42, { align: 'center' });
+  pdf.setFontSize(9);
+  pdf.text(`Código: ${leader.code}`, w/2, 52, { align: 'center' });
+  
+  y = 75;
+  pdf.setTextColor(15, 23, 42);
+  pdf.setFontSize(14).setFont('helvetica', 'bold');
+  pdf.text(`Olá, ${leader.name}!`, margem, y);
+  y += 8;
+  pdf.setFontSize(10).setFont('helvetica', 'normal');
+  pdf.text(`E-mail: ${leader.email}`, margem, y); y += 5;
+  if (leader.company) { pdf.text(`Empresa: ${leader.company}`, margem, y); y += 5; }
+  if (leader.position) { pdf.text(`Cargo: ${leader.position}`, margem, y); y += 5; }
+  pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margem, y); y += 10;
+  
+  // Médias por dimensão
+  pdf.setFontSize(13).setFont('helvetica', 'bold');
+  pdf.setTextColor(11, 74, 162);
+  pdf.text('📊 Suas pontuações por Dimensão', margem, y); y += 8;
+  
+  const dims = calcularMediaPorDimensao(leader.selfAssessment.responses || []);
+  pdf.setTextColor(15, 23, 42);
+  pdf.setFontSize(11).setFont('helvetica', 'normal');
+  dims.forEach(d => {
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(`${d.nome}:`, margem, y);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`${d.media.toFixed(2)} / 5.0`, margem + 60, y);
+    // Barra
+    pdf.setFillColor(226, 232, 240);
+    pdf.rect(margem + 90, y - 4, 80, 5, 'F');
+    pdf.setFillColor(11, 74, 162);
+    pdf.rect(margem + 90, y - 4, (d.media/5)*80, 5, 'F');
+    y += 8;
+  });
+  
+  y += 5;
+  const media = calcularMediaGeral(leader.selfAssessment.responses || []);
+  pdf.setFontSize(12).setFont('helvetica', 'bold');
+  pdf.setTextColor(22, 163, 74);
+  pdf.text(`🎯 Índice Geral de Autoestima: ${media.toFixed(2)} / 5.0`, margem, y); y += 12;
+  
+  // Reflexões
+  pdf.setTextColor(11, 74, 162);
+  pdf.setFontSize(12).setFont('helvetica', 'bold');
+  pdf.text('💎 Pontos Fortes (autopercepção)', margem, y); y += 6;
+  pdf.setTextColor(15, 23, 42);
+  pdf.setFontSize(10).setFont('helvetica', 'normal');
+  const sf = pdf.splitTextToSize(leader.selfAssessment.strengths || '(não preenchido)', w - margem * 2);
+  pdf.text(sf, margem, y); y += sf.length * 5 + 6;
+  
+  if (y > 250) { pdf.addPage(); y = 20; }
+  pdf.setTextColor(11, 74, 162);
+  pdf.setFontSize(12).setFont('helvetica', 'bold');
+  pdf.text('🎯 Pontos de Melhoria', margem, y); y += 6;
+  pdf.setTextColor(15, 23, 42);
+  pdf.setFontSize(10).setFont('helvetica', 'normal');
+  const im = pdf.splitTextToSize(leader.selfAssessment.improvements || '(não preenchido)', w - margem * 2);
+  pdf.text(im, margem, y); y += im.length * 5 + 6;
+  
+  if (y > 250) { pdf.addPage(); y = 20; }
+  pdf.setTextColor(11, 74, 162);
+  pdf.setFontSize(12).setFont('helvetica', 'bold');
+  pdf.text('✨ Impacto que deseja causar', margem, y); y += 6;
+  pdf.setTextColor(15, 23, 42);
+  pdf.setFontSize(10).setFont('helvetica', 'normal');
+  const ip = pdf.splitTextToSize(leader.selfAssessment.impact || '(não preenchido)', w - margem * 2);
+  pdf.text(ip, margem, y);
+  
+  // Footer
+  pdf.setFontSize(8);
+  pdf.setTextColor(100, 116, 139);
+  pdf.text('Impulso IE™ — Rogério Braga | impulsoflow@gmail.com', w/2, 285, { align: 'center' });
+  
+  const blob = pdf.output('blob');
+  return await blobToBase64(blob);
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function gerarPDFAuto() {
+  showAlert('⏳ Gerando PDF...', 'info');
+  try {
+    const pdfBase64 = await gerarPDFAutoBase64(currentLeader);
+    const payload = {
+      apiKey: API_KEY,
+      action: 'sendReportEmail',
+      pdfBase64: pdfBase64,
+      filename: `IGA_Auto_${currentLeader.code}.pdf`,
+      email: currentLeader.email,
+      name: currentLeader.name,
+      leaderCode: currentLeader.code,
+      evaluatorCount: 0
+    };
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) showAlert('✅ PDF enviado para seu e-mail!', 'success');
+    else showAlert(data.error || 'Erro', 'error');
+  } catch (err) {
+    showAlert('Erro ao gerar PDF.', 'error');
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              📄  PDF — RELATÓRIO 360°                    ║
+// ╚══════════════════════════════════════════════════════════╝
+async function gerarPDF360() {
+  const btn = document.getElementById('pdfBtnText');
+  btn.innerHTML = '<span class="spinner"></span>Gerando relatório...';
+  
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const w = pdf.internal.pageSize.getWidth();
+    const margem = 15;
+    let y = 20;
+    
+    const l = currentLeader;
+    const selfDims = calcularMediaPorDimensao(l.selfAssessment.responses || []);
+    const evals = l.evaluations || [];
+    const othersDims = DIMENSOES.map((dim, dIdx) => {
+      let total = 0, count = 0;
+      const start = dIdx * 8;
+      evals.forEach(ev => {
+        const slice = (ev.responses || []).slice(start, start + 8).filter(v => v !== null && !isNaN(v));
+        slice.forEach(v => { total += Number(v); count++; });
+      });
+      return { nome: dim.nome, media: count ? total / count : 0 };
+    });
+    
+    // CAPA
+    pdf.setFillColor(6, 43, 98);
+    pdf.rect(0, 0, w, 297, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(28).setFont('helvetica', 'bold');
+    pdf.text('Relatório 360°', w/2, 80, { align: 'center' });
+    pdf.setFontSize(16).setFont('helvetica', 'normal');
+    pdf.text('IGA — Índice de Autoestima', w/2, 92, { align: 'center' });
+    pdf.setFontSize(12);
+    pdf.text(l.name, w/2, 130, { align: 'center' });
+    pdf.setFontSize(10);
+    pdf.text(`Código: ${l.code}`, w/2, 142, { align: 'center' });
+    pdf.text(`${evals.length} avaliadores`, w/2, 150, { align: 'center' });
+    pdf.text(new Date().toLocaleDateString('pt-BR'), w/2, 158, { align: 'center' });
+    pdf.setFontSize(9);
+    pdf.text('Impulso IE™ — Rogério Braga', w/2, 270, { align: 'center' });
+    
+    // PÁGINA 2: SUMÁRIO EXECUTIVO
+    pdf.addPage(); y = 20;
+    pdf.setTextColor(11, 74, 162);
+    pdf.setFontSize(18).setFont('helvetica', 'bold');
+    pdf.text('Sumário Executivo', margem, y); y += 12;
+    
+    pdf.setTextColor(15, 23, 42);
+    pdf.setFontSize(11).setFont('helvetica', 'normal');
+    const selfMedia = calcularMediaGeral(l.selfAssessment.responses || []);
+    const allOthers = evals.flatMap(e => e.responses || []);
+    const othersMedia = calcularMediaGeral(allOthers);
+    
+    pdf.text(`Sua Autopercepção: ${selfMedia.toFixed(2)} / 5.0`, margem, y); y += 7;
+    pdf.text(`Percepção Externa: ${othersMedia.toFixed(2)} / 5.0`, margem, y); y += 7;
+    pdf.text(`Diferença: ${(selfMedia - othersMedia).toFixed(2)}`, margem, y); y += 12;
+    
+    // Comparativo por dimensão
+    pdf.setFontSize(13).setFont('helvetica', 'bold');
+    pdf.setTextColor(11, 74, 162);
+    pdf.text('Comparativo por Dimensão', margem, y); y += 8;
+    
+    selfDims.forEach((s, i) => {
+      const o = othersDims[i];
+      pdf.setTextColor(15, 23, 42);
+      pdf.setFontSize(11).setFont('helvetica', 'bold');
+      pdf.text(s.nome, margem, y); y += 6;
+      pdf.setFont('helvetica', 'normal').setFontSize(10);
+      
+      // Você
+      pdf.text(`Você:`, margem, y);
+      pdf.setFillColor(226, 232, 240);
+      pdf.rect(margem + 25, y - 3, 100, 4, 'F');
+      pdf.setFillColor(11, 74, 162);
+      pdf.rect(margem + 25, y - 3, (s.media/5)*100, 4, 'F');
+      pdf.text(s.media.toFixed(1), margem + 130, y);
+      y += 6;
+      
+      // Outros
+      pdf.text(`Outros:`, margem, y);
+      pdf.setFillColor(226, 232, 240);
+      pdf.rect(margem + 25, y - 3, 100, 4, 'F');
+      pdf.setFillColor(245, 158, 11);
+      pdf.rect(margem + 25, y - 3, (o.media/5)*100, 4, 'F');
+      pdf.text(o.media.toFixed(1), margem + 130, y);
+      y += 10;
+    });
+    
+    // PÁGINA 3: INSIGHTS
+    pdf.addPage(); y = 20;
+    pdf.setTextColor(11, 74, 162);
+    pdf.setFontSize(18).setFont('helvetica', 'bold');
+    pdf.text('Insights & Pontos Cegos', margem, y); y += 12;
+    
+    pdf.setTextColor(15, 23, 42);
+    pdf.setFontSize(10).setFont('helvetica', 'normal');
+    let temInsight = false;
+    selfDims.forEach((s, i) => {
+      const o = othersDims[i];
+      const diff = s.media - o.media;
+      if (Math.abs(diff) >= 1) {
+        temInsight = true;
+        const isBlind = diff > 0;
+        pdf.setFont('helvetica', 'bold').setFontSize(11);
+        pdf.setTextColor(isBlind ? 217 : 22, isBlind ? 119 : 163, isBlind ? 6 : 74);
+        pdf.text(`${isBlind ? '🎯 Ponto Cego' : '💎 Força Não Reconhecida'}: ${s.nome}`, margem, y); y += 6;
+        pdf.setFont('helvetica', 'normal').setFontSize(10);
+        pdf.setTextColor(15, 23, 42);
+        const txt = isBlind 
+          ? `Você se avalia ${s.media.toFixed(1)}, mas os outros te veem com ${o.media.toFixed(1)}. Reflita sobre essa diferença.`
+          : `Os outros te veem com ${o.media.toFixed(1)}, mas você se avalia em ${s.media.toFixed(1)}. Reconheça essa qualidade!`;
+        const lines = pdf.splitTextToSize(txt, w - margem * 2);
+        pdf.text(lines, margem, y);
+        y += lines.length * 5 + 6;
+      }
+    });
+    
+    if (!temInsight) {
+      pdf.setFont('helvetica', 'italic');
+      pdf.text('Sua autopercepção está coerente com a percepção externa em todas as dimensões.', margem, y);
+      y += 10;
+    }
+    
+    // FEEDBACK QUALITATIVO
+    if (y > 230) { pdf.addPage(); y = 20; }
+    y += 10;
+    pdf.setTextColor(11, 74, 162);
+    pdf.setFontSize(13).setFont('helvetica', 'bold');
+    pdf.text('Feedback dos Avaliadores', margem, y); y += 8;
+    
+    const allStrengths = evals.map(e => e.strengths).filter(Boolean);
+    const allImprov = evals.map(e => e.improvements).filter(Boolean);
+    
+    if (allStrengths.length) {
+      pdf.setFontSize(11).setFont('helvetica', 'bold');
+      pdf.setTextColor(22, 163, 74);
+      pdf.text('💎 Pontos Fortes Reconhecidos:', margem, y); y += 6;
+      pdf.setTextColor(15, 23, 42);
+      pdf.setFontSize(10).setFont('helvetica', 'normal');
+      allStrengths.forEach(s => {
+        const lines = pdf.splitTextToSize(`• ${s}`, w - margem * 2);
+        if (y + lines.length * 5 > 280) { pdf.addPage(); y = 20; }
+        pdf.text(lines, margem, y);
+        y += lines.length * 5 + 3;
+      });
+      y += 5;
+    }
+    
+    if (allImprov.length) {
+      if (y > 240) { pdf.addPage(); y = 20; }
+      pdf.setFontSize(11).setFont('helvetica', 'bold');
+      pdf.setTextColor(217, 119, 6);
+      pdf.text('🎯 Sugestões de Desenvolvimento:', margem, y); y += 6;
+      pdf.setTextColor(15, 23, 42);
+      pdf.setFontSize(10).setFont('helvetica', 'normal');
+      allImprov.forEach(s => {
+        const lines = pdf.splitTextToSize(`• ${s}`, w - margem * 2);
+        if (y + lines.length * 5 > 280) { pdf.addPage(); y = 20; }
+        pdf.text(lines, margem, y);
+        y += lines.length * 5 + 3;
+      });
+    }
+    
+    // PDI
+    pdf.addPage(); y = 20;
+    pdf.setTextColor(11, 74, 162);
+    pdf.setFontSize(18).setFont('helvetica', 'bold');
+    pdf.text('Plano de Desenvolvimento (PDI)', margem, y); y += 10;
+    pdf.setFontSize(11).setFont('helvetica', 'italic');
+    pdf.setTextColor(15, 23, 42);
+    pdf.text('Próximos 90 dias', margem, y); y += 12;
+    
+    pdf.setFontSize(10).setFont('helvetica', 'normal');
+    const pdi = [
+      '🎯 Mês 1 — Consciência: Reflita sobre os pontos cegos identificados acima.',
+      '📚 Mês 2 — Ação: Pratique 1 comportamento novo por semana relacionado às áreas de melhoria.',
+      '🌟 Mês 3 — Integração: Peça feedback contínuo a 2-3 pessoas de confiança.',
+      '',
+      '💡 Lembre-se: autoestima é uma jornada, não um destino.',
+      'Releia este relatório a cada 30 dias.'
+    ];
+    pdi.forEach(p => {
+      const lines = pdf.splitTextToSize(p, w - margem * 2);
+      pdf.text(lines, margem, y);
+      y += lines.length * 5 + 4;
+    });
+    
+    // Footer final
+    pdf.setFontSize(8);
+    pdf.setTextColor(100, 116, 139);
+    pdf.text('Impulso IE™ — Rogério Braga | impulsoflow@gmail.com', w/2, 285, { align: 'center' });
+    
+    const blob = pdf.output('blob');
+    const pdfBase64 = await blobToBase64(blob);
+    
+    // Envia para backend
+    const payload = {
+      apiKey: API_KEY,
+      action: 'sendReportEmail',
+      pdfBase64: pdfBase64,
+      filename: `IGA_360_${l.code}.pdf`,
+      email: l.email,
+      name: l.name,
+      leaderCode: l.code,
+      evaluatorCount: evals.length
+    };
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    
+    if (data.ok) {
+      // Download local também
+      pdf.save(`IGA_360_${l.code}.pdf`);
+      showAlert('✅ Relatório gerado, baixado e enviado para seu e-mail!', 'success');
+    } else {
+      showAlert(data.error || 'Erro ao enviar', 'error');
+    }
+    btn.innerHTML = '📄 Gerar e Enviar Relatório PDF';
+  } catch (err) {
+    console.error(err);
+    showAlert('Erro ao gerar PDF.', 'error');
+    btn.innerHTML = '📄 Gerar e Enviar Relatório PDF';
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              🔒  ENCERRAMENTO + LOGOUT                   ║
+// ╚══════════════════════════════════════════════════════════╝
+function confirmarEncerramento() {
+  document.getElementById('closeModal').classList.add('active');
+}
+
+async function encerrarAvaliacao() {
+  try {
+    const payload = {
+      apiKey: API_KEY,
+      action: 'closeLeader',
+      leaderCode: currentLeader.code,
+      email: currentLeader.email
+    };
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      currentLeader.status = 'closed';
+      localStorage.setItem('iga_leader', JSON.stringify(currentLeader));
+      document.getElementById('closeModal').classList.remove('active');
+      showAlert('🔒 Avaliação encerrada.', 'success');
+      renderDashboard();
+    } else {
+      showAlert(data.error || 'Erro', 'error');
+    }
+  } catch (err) {
+    showAlert('Erro de conexão.', 'error');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('iga_leader');
+  currentLeader = null;
+  location.reload();
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              🔑  RECUPERAÇÃO DE PIN                      ║
+// ╚══════════════════════════════════════════════════════════╝
+function abrirRecuperacao(e) {
+  e.preventDefault();
+  document.getElementById('recoveryModal').classList.add('active');
+}
+
+function fecharRecuperacao() {
+  document.getElementById('recoveryModal').classList.remove('active');
+}
+
+async function recuperarPin() {
+  const email = document.getElementById('recoveryEmail').value.trim();
+  const btn = document.getElementById('recoveryBtnText');
+  if (!email || !email.includes('@')) return showAlert('Digite um e-mail válido', 'error');
+  
+  btn.innerHTML = '<span class="spinner"></span>Enviando...';
+  try {
+    const url = `${API_URL}?action=recoverPin&apiKey=${encodeURIComponent(API_KEY)}&email=${encodeURIComponent(email)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.ok) {
+      fecharRecuperacao();
+      showAlert('✅ PIN enviado para seu e-mail!', 'success');
+    } else {
+      showAlert(data.error || 'Erro', 'error');
+    }
+  } catch (err) {
+    showAlert('Erro de conexão.', 'error');
+  } finally {
+    btn.innerHTML = 'Enviar';
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                   🚨  ALERTAS                            ║
+// ╚══════════════════════════════════════════════════════════╝
+function showAlert(msg, type = 'info') {
+  const alert = document.getElementById('alertBox');
+  alert.className = `alert alert-${type} show`;
+  alert.textContent = msg;
+  alert.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(() => alert.classList.remove('show'), 5000);
+}
+</script>
+
+</body>
+</html>
