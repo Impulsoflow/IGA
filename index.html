@@ -1076,8 +1076,19 @@ function renderQuestion() {
 function selectOption(num) {
   responses[current] = num;
   renderQuestion();
+  
+  // 🚀 Auto-avanço para próxima pergunta após 400ms
+  setTimeout(() => {
+    if (current < TOTAL_Q - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      // Última pergunta → vai para reflexões
+      showStep('step-comments');
+    }
+  }, 400);
 }
-
+ 
 function updateProgress() {
   const answered = responses.filter(r => r !== null).length;
   document.getElementById('answered-count').textContent = answered;
